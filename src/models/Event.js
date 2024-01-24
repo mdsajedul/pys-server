@@ -39,8 +39,9 @@ const eventSchema = new mongoose.Schema({
     ],
   },
   eventType: {
-    type: String,
-    // Add any specific constraints or validation for event types if needed
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'EventType',
+    required: true
   },
 });
 

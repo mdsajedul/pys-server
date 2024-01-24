@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
   },
   fatherName: {
     type: String,
-    required: true,
+    // required: true,
   },
   avatar: {
     type: String,
@@ -19,11 +19,11 @@ const userSchema = new mongoose.Schema({
   },
   address: {
     type: String,
-    required: true,
+    // required: true,
   },
   password: {
     type: String,
-    required: true,
+    // required: true,
     minlength: [6, "Password is too short"],
   },
   dateOfBirth: {
@@ -35,13 +35,23 @@ const userSchema = new mongoose.Schema({
   },
   roles: {
     type: [String], 
-    enum: ["ADMIN", "MEMBER", "SENIOR"],
+    enum: ["ADMIN", "MEMBER", "SENIOR","USER"],
+    default: ["USER"]
   },
   email: {
     type: String,
     unique: true,
     sparse: true,
   },
+  status:{
+    type: String,
+    enum:["PENDING","ACTIVE","BLOCK"],
+    default: "PENDING"
+  },
+  registered:{
+    type: Boolean,
+    default: false
+  }
 });
 
 const User = mongoose.model("User", userSchema);
