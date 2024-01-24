@@ -1,4 +1,4 @@
-const { changeUserStatus } = require("../services/user");
+const { changeUserStatus, searchUsers } = require("../services/user");
 
 
 const changeUserStatusController = async (req, res, next) => {
@@ -17,8 +17,18 @@ const changeUserStatusController = async (req, res, next) => {
     }
 };
 
+const searchUsersController = async (req, res, next) => {
+    const searchParam = req.query.searchParam;
+    try {
+      const users = await searchUsers(searchParam);
+      res.status(200).json({ users });
+    } catch (error) {
+      next(error);
+    }
+  };
 
 
 module.exports ={
-    changeUserStatusController
+    changeUserStatusController,
+    searchUsersController
 }

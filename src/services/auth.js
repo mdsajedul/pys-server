@@ -11,7 +11,7 @@ const registerService = async({fullName,phoneNumber,password,roles })=>{
     if(user) throw error('User already exist!',400)
     const salt =await bcrypt.genSalt(parseInt(bcryptSalt));
     const hash = await bcrypt.hash(password, salt);
-    return createNewUser({fullName, phoneNumber, password: hash, roles})
+    return createNewUser({fullName, phoneNumber, password: hash, roles,register:true})
 }
 
 const loginService =async ({phoneNumber,password})=>{

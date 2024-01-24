@@ -7,5 +7,6 @@ const roleAuthorization = require('../middlewares/roleAuthorization');
 
 router.post('/:id/change-status', authenticate, roleAuthorization(['ADMIN']), userController.changeUserStatusController)
 router.post('/:id/password-reset', authenticate, authController.passwordResetController)
+router.get('/search',userController.searchUsersController)
 
 module.exports = router

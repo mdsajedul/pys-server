@@ -12,14 +12,17 @@ const findUserByProperties =(key,value)=>{
     return User.findOne({[key]: value}).exec()
 }
 
-const createNewUser = ({fullName,phoneNumber,password,roles})=>{
+
+const createNewUser = ({fullName,phoneNumber,password,roles,register,fatherName,address})=>{
     const user = new User({
         fullName,
         phoneNumber,
         password,
-        roles: roles? roles : ['User'],
+        roles: roles? roles : ['USER'],
         status:'PENDING',
-        registered:true
+        registered:register? register : false,
+        fatherName,
+        address
     })
     return user.save()
 }
@@ -56,10 +59,28 @@ const changeUserStatus = async (userId, newStatus) => {
     return updatedUser;
 };
 
+const searchUsers = async (searchParam) => {
+  const regex = new RegExp(searchParam, "i"); // "i" for case-insensitive search
+
+  try {
+    const users = await User.find({
+      $or: [
+        { phoneNumber: { $regex: regex } },
+        { fullName: { $regex: regex } },
+      ],
+    }).exec();
+
+    return users;
+  } catch (error) {
+    throw error("Error in searching users", 500);
+  }
+};
+
 module.exports = {
     createNewUser,
     updateUser,
     findUser,
     findUserByProperties,
     changeUserStatus,
+    searchUsers
 };
