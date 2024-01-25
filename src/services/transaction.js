@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const Transaction = require("../models/Transaction");
 const error = require("../utils/error");
 const { findUserByProperties, createNewUser } = require("./user");
@@ -26,9 +27,22 @@ const findOrCreateUser = async ({userId,fullName,phoneNumber,fatherName,address}
 
 const findTransactions = () => {
     return Transaction.find()
-        .populate('event')
-        .populate('submittedBy') 
-        .populate('user')  
+        .populate({
+            path:'event',
+            select:'eventName eventDetails eventPlace eventDate',
+            populate:{
+                path:'eventType',
+                select:'typeName'
+            }
+        })
+        .populate({
+            path:'submittedBy',
+            select:'fullName fatherName'
+        }) 
+        .populate({
+            path:'user',
+            select:'fullName fatherName'
+        })  
         .exec();
 };
 
@@ -61,6 +75,38 @@ const performTransaction = async (transactionData) => {
 
 }
 
+const calculateTotalDebitByEventId =async (eventId)=>{
+    try {
+        const totalDebit = await Transaction.aggregate([
+            {
+                $match: {event: mongoose.Types.ObjectId(eventId),type:'DEBIT'}
+            },
+            {
+                $group: {_id:null, total: {$sum: "$amount"}}
+            }
+        ])
+        return totalDebit.length > 0 ? totalDebit[0].total : 0;
+    } catch (error) {
+        return { success: false, message: error.message };
+    }
+} 
+
+const calculateTotalCreditByEventId =async (eventId)=>{
+    try {
+        const totalCredit = await Transaction.aggregate([
+            {
+                $match: {event: mongoose.Types.ObjectId(eventId),type:'CREDIT'}
+            },
+            {
+                $group: {_id:null, total: {$sum: "$amount"}}
+            }
+        ])
+        return totalCredit.length > 0 ? totalCredit[0].total : 0;
+    } catch (error) {
+        return { success: false, message: error.message };
+    }
+} 
+
 module.exports ={
-    performTransaction, findTransactions
+    performTransaction, findTransactions, calculateTotalDebitByEventId, calculateTotalCreditByEventId
 }
