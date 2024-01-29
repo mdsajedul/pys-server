@@ -6,5 +6,6 @@ const roleAuthorization = require('../middlewares/roleAuthorization');
 
 router.post('/perform', authenticate, roleAuthorization(['ADMIN']), transactionController.performTransactionController)
 router.get('/', authenticate, roleAuthorization(['ADMIN']), transactionController.getAllTransaction)
+router.get('/:eventId/total', authenticate, roleAuthorization(['ADMIN']), transactionController.getTransactionTotalsByEventId)
 
 module.exports = router

@@ -107,6 +107,53 @@ const calculateTotalCreditByEventId =async (eventId)=>{
     }
 } 
 
+const calculateTransactionTotalsByEventId = async (eventId) => {
+    try {
+        if (!mongoose.Types.ObjectId.isValid(eventId)) {
+            return { success: false, message: "Invalid eventId format" };
+        }
+
+        const result = await Transaction.aggregate([
+            {
+                $match: { event:new mongoose.Types.ObjectId(eventId) }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalDebit: {
+                        $sum: {
+                            $cond: [{ $eq: ["$type", "DEBIT"] }, "$amount", 0]
+                        }
+                    },
+                    totalCredit: {
+                        $sum: {
+                            $cond: [{ $eq: ["$type", "CREDIT"] }, "$amount", 0]
+                        }
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    totalDebit: 1,
+                    totalCredit: 1,
+                    total: { $subtract: ["$totalCredit", "$totalDebit"] }
+                }
+            }
+        ]);
+
+        if (result.length > 0) {
+            return { success: true, transactions: result[0] };
+        } else {
+            return { success: true, transactions: { totalDebit: 0, totalCredit: 0, total: 0 } };
+        }
+        
+    } catch (error) {
+        return { success: false, message: error.message };
+    }
+};
+
+
 module.exports ={
-    performTransaction, findTransactions, calculateTotalDebitByEventId, calculateTotalCreditByEventId
+    performTransaction, findTransactions, calculateTotalDebitByEventId, calculateTotalCreditByEventId, calculateTransactionTotalsByEventId
 }
