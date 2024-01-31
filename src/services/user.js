@@ -5,6 +5,10 @@ const findUser = ()=>{
     return User.find();
 }
 
+const findUserWithoutSensitiveInfo = ()=>{
+    return User.find().select('-password')
+}
+
 const findUserByProperties =(key,value)=>{
     if(key==='_id'){
         return User.findById(value).exec()
@@ -82,5 +86,6 @@ module.exports = {
     findUser,
     findUserByProperties,
     changeUserStatus,
-    searchUsers
+    searchUsers,
+    findUserWithoutSensitiveInfo
 };

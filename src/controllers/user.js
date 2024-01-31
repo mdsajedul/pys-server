@@ -1,4 +1,4 @@
-const { changeUserStatus, searchUsers } = require("../services/user");
+const { changeUserStatus, searchUsers, findUser, findUserWithoutSensitiveInfo } = require("../services/user");
 
 
 const changeUserStatusController = async (req, res, next) => {
@@ -27,8 +27,21 @@ const searchUsersController = async (req, res, next) => {
     }
   };
 
+  const getAllUser = async (_req,res,next)=>{
+    try {
+      const users = await findUserWithoutSensitiveInfo();
+      if(!users){
+         res.status(400).json({ message:'Users not found!' });
+      }
+      res.status(200).json({ users });
+    } catch (error) {
+      next(error)
+    }
+  }
+
 
 module.exports ={
     changeUserStatusController,
-    searchUsersController
+    searchUsersController,
+    getAllUser
 }
